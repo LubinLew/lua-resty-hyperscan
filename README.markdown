@@ -51,7 +51,13 @@ You should build the hyperscan shared library. I got some pre-build blow:
 Synopsis
 ========
 
-## normal mode
+Support Normal Mode(default) and  [Runtime Mode](https://intel.github.io/hyperscan/dev-reference/serialization.html#the-runtime-library).
+
+## Normal Mode
+
+Use library [libhs.so.5.4.0](https://github.com/LubinLew/lua-resty-hyperscan/blob/main/hslibs/el7_x64/libhs.so.5.4.0 "libhs.so.5.4.0")
+
+Support [Compiling Patterns](http://intel.github.io/hyperscan/dev-reference/compilation.html) and [Scanning for Patterns](http://intel.github.io/hyperscan/dev-reference/runtime.html)
 
 ```lua
 init_by_lua_block {
@@ -92,10 +98,13 @@ location = / {
         end
     }
 }
-
 ```
 
 ## Runtime Mode
+
+Use library [libhs_runtime.so.5.4.0](https://github.com/LubinLew/lua-resty-hyperscan/blob/main/hslibs/el7_x64/libhs_runtime.so.5.4.0)
+
+Only support [Scanning for Patterns](http://intel.github.io/hyperscan/dev-reference/runtime.html)
 
 ```lua
 init_by_lua_block {
@@ -131,8 +140,6 @@ location = / {
     }
 }
 ```
-
-
 
 [Back to TOC](#table-of-contents)
 
@@ -268,8 +275,6 @@ boolean value.
 
 [Back to TOC](#table-of-contents)
 
-
-
 ## scan
 
 ```lua
@@ -295,8 +300,6 @@ boolean value. true for match success and `ret`  is the pattern id, false for no
 
 pattern id.
 
-
-
 ## free
 
 ```lua
@@ -314,8 +317,6 @@ boolean value. true for success, false for failure and check ther `err`.
 #### `err`
 
 string value to indicate error.
-
-
 
 ## set
 
@@ -335,8 +336,6 @@ boolean value. true for success, false for failure and check ther `err`.
 
 string value to indicate error.
 
-
-
 ## get
 
 ```lua
@@ -351,8 +350,6 @@ get instance.
 
 nil for failure.
 
-
-
 ## clone
 
 ```lua
@@ -366,8 +363,6 @@ clone a instance, this is for muti-threads. then 2 threads can scan the same dat
 #### `new_instance`
 
 clone one
-
-
 
 [Back to TOC](#table-of-contents)
 
