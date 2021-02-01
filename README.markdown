@@ -169,7 +169,7 @@ boolean value. true for success, false for failure and check ther `err`.
 
 #### `err`
 
-string value to indicate error. 
+string value to indicate error.
 
 [Back to TOC](#table-of-contents)
 
@@ -192,7 +192,7 @@ Create a Hyperscan Instance.
 
 - hs.`HS_MODE_VECTORED`    Vectored mode: the target data consists of a list of non-contiguous blocks that are available all at once. As for block mode, no retention of state is required.
 
-> [Compiling Patterns &#8212; Hyperscan 5.3.0 documentation](http://intel.github.io/hyperscan/dev-reference/compilation.html#compilation)
+> [Compiling Patterns &#8212; Hyperscan documentation](http://intel.github.io/hyperscan/dev-reference/compilation.html#compilation)
 
 ### Return Value
 
@@ -384,6 +384,6 @@ This module is licensed under the MIT license.
 See Also
 ========
 
-* Hyperscan Developer’s Reference Guide: http://intel.github.io/hyperscan/dev-reference/
+* [Hyperscan Developer’s Reference Guide](http://intel.github.io/hyperscan/dev-reference/)
 
 [Back to TOC](#table-of-contents)

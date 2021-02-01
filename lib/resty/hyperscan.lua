@@ -18,7 +18,7 @@ local _M = {
     -- work mode
     HS_WORK_NORMAL       = 1, -- both Compilation and Scanning, use libhs.so
     HS_WORK_RUNTIME      = 2, --[[only Scanning, use libhs_runtime.so,
-       see http://intel.github.io/hyperscan/dev-reference/serialization.html --]]
+        see http://intel.github.io/hyperscan/dev-reference/serialization.html --]]
 
     -- scan mode flag
     HS_MODE_BLOCK        =  1,
@@ -190,7 +190,7 @@ local function _translate_compile_flags(str)
         return -1, "Invalid flags type: '" .. type(str) .. "', should be string."
     end
 
-    local flags = 0;
+    local flags = 0
     local flag_bytes = {str:byte(1, #str)}
     for i = 1, #flag_bytes do
         local byte = string.char(flag_bytes[i])
@@ -202,7 +202,7 @@ local function _translate_compile_flags(str)
         end
     end
 
-    return flags;
+    return flags
 end
 
 --[[ get shared libray name based on platform
