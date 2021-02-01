@@ -1,4 +1,4 @@
-.PYONY: all clean
+.PHONY: all clean
 
 TARGET := test
 CC     := gcc
