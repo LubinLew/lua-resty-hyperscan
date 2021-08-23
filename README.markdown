@@ -3,6 +3,9 @@ Name
 
 lua-resty-hyperscan - [Hyperscan](https://github.com/intel/hyperscan) for [Openresty](https://github.com/openresty/openresty)
 
+!!! This Branch got [too many callbacks](https://github.com/LubinLew/lua-resty-hyperscan/issues/1) problem, because https://luajit.org/ext_ffi_semantics.html#callback.
+Need a C wrapper.
+
 Table of Contents
 =================
 
