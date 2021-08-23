@@ -40,13 +40,14 @@ Description
 
 You should build the hyperscan shared library. I got some pre-build blow:
 
-- [CentOS 7](https://github.com/LubinLew/lua-resty-hyperscan/tree/master/hslibs/el7_x64)
+- [CentOS 7](https://github.com/LubinLew/lua-resty-hyperscan/tree/main/hslibs/el7_x64)
 
-- [CentOS 8](https://github.com/LubinLew/lua-resty-hyperscan/tree/master/hslibs/el8_x64)
+- [CentOS 8](https://github.com/LubinLew/lua-resty-hyperscan/tree/main/hslibs/el8_x64)
 
-- [MacOS](https://github.com/LubinLew/lua-resty-hyperscan/tree/master/hslibs/osx)
+- [MacOS](https://github.com/LubinLew/lua-resty-hyperscan/tree/main/hslibs/osx)
 
-- [~~Windows 10~~](https://github.com/LubinLew/lua-resty-hyperscan/tree/master/hslibs/win10_x64)
+- [~~Windows 10~~](https://github.com/LubinLew/lua-resty-hyperscan/tree/main/hslibs/win10_x64)
+
 
 Synopsis
 ========
