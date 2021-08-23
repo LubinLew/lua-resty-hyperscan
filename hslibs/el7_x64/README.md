@@ -1,3 +1,8 @@
+# Build HyperScan on CentOS 7
+
+Just run the script blow.
+
+```bash
 HS_VER=5.4.0
 BOOST_VER=1.77.0
 
@@ -27,3 +32,4 @@ make -j8 || exit 1
 
 # show result
 ls -lh  lib
+```
