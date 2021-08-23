@@ -18,8 +18,8 @@ wget https://github.com/intel/hyperscan/archive/v${HS_VER}.tar.gz || exit 1
 tar xf v${HS_VER}.tar.gz
 
 BOOST_FOLDER_NAME=`echo ${BOOST_VER} | sed 's/\./_/g'`
-wget https://dl.bintray.com/boostorg/release/${BOOST_VER}/source/boost_${BOOST_FOLDER_NAME}.tar.gz || exit 1
-tar xf boost_${BOOST_FOLDER_NAME}.tar.gz
+wget https://boostorg.jfrog.io/native/main/release/${BOOST_VER}/source/boost_${BOOST_FOLDER_NAME}.tar.bz2 || exit 1
+tar xf boost_${BOOST_FOLDER_NAME}.tar.bz2
 
 mkdir build
 cd build
