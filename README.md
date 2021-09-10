@@ -1,5 +1,4 @@
-Name
-====
+## lua-resty-hyperscan
 
 lua-resty-hyperscan - [Hyperscan](https://github.com/intel/hyperscan) for [Openresty](https://github.com/openresty/openresty)
 
@@ -11,20 +10,19 @@ So we need a [C wrapper](hs_wrapper/) to handle callbacks.
 
 <!-- TOC -->
 
+- [lua-resty-hyperscan](#lua-resty-hyperscan)
 - [Table of Contents](#table-of-contents)
 - [Status](#status)
-- [Description](#description)
 - [Synopsis](#synopsis)
 - [Methods](#methods)
-    - [block_new](#block_new)
-    - [block_free](#block_free)
-        - [Pattern List](#pattern-list)
-            - [Example](#example)
-            - [Flags](#flags)
-        - [scan](#scan)
-- [Author](#author)
+  - [block_new](#block_new)
+  - [block_free](#block_free)
+  - [handle:compile](#handlecompile)
+    - [Pattern List](#pattern-list)
+      - [Example](#example)
+      - [Flags](#flags)
+  - [handle:scan](#handlescan)
 - [Copyright and License](#copyright-and-license)
-- [See Also](#see-also)
 
 <!-- /TOC -->
 
@@ -32,13 +30,9 @@ So we need a [C wrapper](hs_wrapper/) to handle callbacks.
 
 This library is under development so far.
 
-## Description
-
 **THIS LIBRARY ONLY SUPPORT [BLOCK SCAN](http://intel.github.io/hyperscan/dev-reference/api_files.html#c.HS_MODE_BLOCK) NOW !**
 
 **THIS LIBRARY IS ONLY TESTED on CentOS 7 !**
-
-
 
 ----
 
@@ -118,7 +112,7 @@ end
 
 ### block_new
 
-Create a hyperscan instance for block mode 
+Create a hyperscan instance for block mode
 
 ```lua
 local handle, err = whs.block_new(name, debug)
@@ -127,22 +121,24 @@ if not handle then
 end
 ```
 
-| Field        | Name     | Type    | Description                   |
-| ------------ | -------- | ------- | ----------------------------- |
-| Parameter    | `name`   | string  | instance name, mainly for log |
-|              | `debug`  | boolean | enable/disable debug log      |
-| Return Value | `handle` | cdata   | instance pointer              |
-|              | `err`    | string  | reason of failure             |
+| Field        | Name     | Lua Type | Description                   |
+| ------------ | -------- | -------- | ----------------------------- |
+| Parameter    | `name`   | string   | instance name, mainly for log |
+|              | `debug`  | boolean  | enable/disable debug log      |
+| Return Value | `handle` | cdata    | instance pointer              |
+|              | `err`    | string   | reason of failure             |
 
 [Back to TOC](#table-of-contents)
 
-###  block_free
+### block_free
 
 Destroy a hyperscan instance for block mode
 
 ```lua
 whs.block_free(name)
 ```
+
+### handle:compile
 
 ```lua
 --local handle = whs.block_new(name, debug)
@@ -152,11 +148,11 @@ if not ok then
 end
 ```
 
-| Field        | Name       | Type    | Description         |
-| ------------ | ---------- | ------- | ------------------- |
-| parameter    | `patterns` | table   | table(pattern list) |
-| Return Value | `ok`       | boolean | success/failure     |
-|              | `err`      | string  | reason of failure   |
+| Field        | Name       | Lua Type | Description       |
+| ------------ | ---------- | -------- | ----------------- |
+| parameter    | `patterns` | table    | pattern list)     |
+| Return Value | `ok`       | boolean  | success/failure   |
+|              | `err`      | string   | reason of failure |
 
 #### Pattern List
 
@@ -172,7 +168,7 @@ local patterns = {
 
 ##### Flags
 
-| Flag  | Hyperscan Value                                                                                              | Remark                                                  |
+| Flag  | Hyperscan Value                                                                                              | Description                                             |
 | ----- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
 | `'i'` | [HS_FLAG_CASELESS](http://intel.github.io/hyperscan/dev-reference/api_files.html#c.HS_FLAG_CASELESS)         | Set case-insensitive matching                           |
 | `'d'` | [HS_FLAG_DOTALL](http://intel.github.io/hyperscan/dev-reference/api_files.html#c.HS_FLAG_DOTALL)             | Matching a `.` will not exclude newlines.               |
@@ -186,29 +182,35 @@ local patterns = {
 | `'c'` | [HS_FLAG_COMBINATION](http://intel.github.io/hyperscan/dev-reference/api_files.html#c.HS_FLAG_COMBINATION)   | Logical combination.                                    |
 | `'q'` | [HS_FLAG_QUIET](http://intel.github.io/hyperscan/dev-reference/api_files.html#c.HS_FLAG_QUIET)               | Don't do any match reporting.                           |
 
-#### scan
+### handle:scan
 
 ```lua
-local ok, id, from, to = instance:scan(data)
+--local handle = whs.block_new(name, debug)
+local ok, id, from, to = handle:scan(data)
 if ok then
-    ngx.log(ngx.INFO, )
+    ngx.log(ngx.INFO, "match success", id, from, to)
 end
 ```
 
-[Back to TOC](#table-of-contents)
+| Field        | Name   | Lua Type | Description                                  |
+| ------------ | ------ | -------- | -------------------------------------------- |
+| Parameter    | `data` | string   | string to be scanned                         |
+| Return Value | `ok`   | boolean  | `ture` for match, `false` for not match      |
+|              | `id`   | number   | match id                                     |
+|              | `from` | number   | match from byte arrary index(include itself) |
+|              | `to`   | number   | match end byte arrary index(exclude itself)  |
+
+[I Back to TOC](#table-of-contents)
 
 ---
 
-## Author
-
-Lubin <lgbxyz@gmail.com>.
-
 ## Copyright and License
+
+Author: Lubin <lgbxyz@gmail.com>.
 
 This module is licensed under the MIT license.
 
-## See Also
+**See Also**
 
 * [Hyperscan Developer’s Reference Guide](http://intel.github.io/hyperscan/dev-reference/)
-
-[Back to TOC](#table-of-contents)
+- [hyperscan packaging for CentOS7/8](https://github.com/OpenSecHub/hyperscan-packaging)
