@@ -17,13 +17,12 @@ Normal Mode Test
 
 --- http_config
 init_by_lua_block {
-    local hs = require('hyperscan')
-    local ret, err = hs.init(hs.HS_WORK_NORMAL)
-    if not ret then
+    local whs, err = require('hyperscan')
+    if not whs then
         ngx.log(ngx.ERR, "hyperscan init failed, ", err)
     end
 
-    local obj = hs.new(hs.HS_MODE_BLOCK)
+    local handle = whs.block_new("test", false)
 
     local patterns = {
         {id = 1001, pattern = "\\d3",       flag = "iu"},
@@ -32,7 +31,7 @@ init_by_lua_block {
     }
 
     -- compile patterns to a database
-    ret, err = obj:compile(patterns)
+    ret, err = handle:compile(patterns)
     if not ret then
         ngx.log(ngx.ERR, "hyperscan block compile failed, ", err)
         return
@@ -44,9 +43,9 @@ init_by_lua_block {
 --- config
 location = /t {
     content_by_lua_block {
-        local hs = require('hyperscan')
-        local obj = hs.get("test1_obj")
-        local ret, id = obj:scan("abcdefghisghk")
+        local whs = require('hyperscan')
+        local handle = whs.block_get("test")
+        local ret, id = handle:scan("abcdefghisghk")
         if ret then
             return ngx.print("matchid:", id)
         else
