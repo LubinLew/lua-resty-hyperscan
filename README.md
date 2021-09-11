@@ -143,7 +143,7 @@ end
 | Field        | Name     | Lua Type | Description                   |
 | ------------ | -------- | -------- | ----------------------------- |
 | Parameter    | `name`   | string   | instance name, mainly for log |
-|              | `debug`  | boolean  | enable/disable debug log      |
+|              | `debug`  | boolean  | enable/disable write debug log to syslog |
 | Return Value | `handle` | cdata    | instance pointer              |
 |              | `err`    | string   | reason of failure             |
 

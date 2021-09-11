@@ -10,7 +10,7 @@ TOOL: Test::Nginx
 yum install -y cpanminus
 cpanm Test::Nginx --force
 
-./go.sh
+bash -x t/go.sh
 ```
 
 > Notes:
@@ -32,7 +32,7 @@ cd wrk-4.1.0
 make -j4
 cp wrk /usr/bin/
 
-wrk -t12 -c400 -d30s http://localhost/index.html
+wrk -t20 -c4000 -d60s http://localhost/index.html
 ```
 
 > Notes:
