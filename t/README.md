@@ -14,9 +14,9 @@ cpanm Test::Nginx --force
 ```
 
 > Notes:
-> 
+>
 > [Automated Testing - Programming OpenResty](https://openresty.gitbooks.io/programming-openresty/content/testing/)
-> 
+>
 > [openresty/test-nginx: Data-driven test scaffold for Nginx C module and OpenResty Lua library development](https://github.com/openresty/test-nginx)
 
 -------
@@ -36,7 +36,7 @@ wrk -t12 -c400 -d30s http://localhost/index.html
 ```
 
 > Notes:
-> 
+>
 > [GitHub - wg/wrk: Modern HTTP benchmarking tool](https://github.com/wg/wrk)
 
 

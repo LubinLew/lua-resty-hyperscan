@@ -43,6 +43,7 @@ configuration example
 ```lua
 user  nobody;
 worker_processes  auto;
+error_log logs/error.log error;
 
 events {
     worker_connections  1024;
@@ -51,6 +52,8 @@ events {
 http {
     include       mime.types;
     default_type  application/octet-stream;
+
+    access_log  logs/access.log;
 
     init_by_lua_block {
        local whs, err = require('hyperscan')
