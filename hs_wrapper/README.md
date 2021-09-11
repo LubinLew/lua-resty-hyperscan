@@ -16,4 +16,10 @@ You should build the hyperscan library first. here are some pre-build blow:
 
 - [Debian(bullseye)](https://packages.debian.org/bullseye/libhyperscan-dev)
 
-Then, run `make all` to build this wrapper library(libwhs.so).
+Then, build this wrapper library(libwhs.so).
+
+```bash
+yum install -y gcc make libstdc++-static
+
+make all
+```
