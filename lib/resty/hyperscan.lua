@@ -29,7 +29,7 @@ ffi.cdef[[
 
 typedef void whs_hdl_t;
 
-/* test the current system architecture 
+/* test the current system architecture
  * Return:
  *     -1: This system does not support Hyperscan
  *      0: success
@@ -238,7 +238,7 @@ end
 function _M.block_free(name)
     local handle_table = store[name]
     if handle_table then
-        _whs_block_free(handle_table)
+        _whs_block_free(handle_table.handle)
         store[name] = nil
     end
 end

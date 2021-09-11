@@ -26,3 +26,9 @@ make all
 cp libwhs.so /usr/local/openresty/site/lualib/
 ```
 
+> Notes:
+> This shared library output log to syslog.
+> 
+> - CentOS - /var/log/messages
+> 
+> - Ubuntu - /var/log/rsyslog
