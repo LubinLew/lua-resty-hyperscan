@@ -22,4 +22,6 @@ Then, build this wrapper library(libwhs.so).
 yum install -y gcc make libstdc++-static
 
 make all
+
+cp libwhs.so /usr/local/openresty/site/lualib/
 ```

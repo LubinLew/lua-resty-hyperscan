@@ -36,8 +36,6 @@ init_by_lua_block {
         ngx.log(ngx.ERR, "hyperscan block compile failed, ", err)
         return
     end
-
-    hs.set("test1_obj", obj)
 }
 
 --- config

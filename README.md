@@ -97,6 +97,22 @@ http {
 }
 ```
 
+test with uri
+
+```bash
+$ curl http://localhost
+[/] not match any rule.
+
+$ curl http://localhost/111111111
+[/111111111] not match any rule.
+
+$ curl http://localhost/aaaaaaa
+[/aaaaaaa] match: 1003 zone [0 - 3).
+
+$ curl "http://localhost/      end"
+[/      end] match: 1002 zone [0 - 4).
+```
+
 [Back to TOC](#table-of-contents)
 
 ## Methods
