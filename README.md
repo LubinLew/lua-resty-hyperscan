@@ -252,5 +252,9 @@ This module is licensed under the MIT license.
 
 **See Also**
 
-* [Hyperscan Developer’s Reference Guide](http://intel.github.io/hyperscan/dev-reference/)
+- [Hyperscan Developer’s Reference Guide](http://intel.github.io/hyperscan/dev-reference/)
 - [hyperscan packaging for CentOS7/8](https://github.com/OpenSecHub/hyperscan-packaging)
+- [fengjian/resty-hyperscan-ffi](https://github.com/fengjian/resty-hyperscan-ffi)
+- [ebayboy/luajit_hyperscan](https://github.com/ebayboy/luajit_hyperscan)
+- [starius/luahs](https://github.com/starius/luahs)
+- [anhk/lua-hyperscan](https://github.com/anhk/lua-hyperscan)
