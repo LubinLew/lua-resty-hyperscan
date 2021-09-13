@@ -6,26 +6,6 @@ lua-resty-hyperscan - [Hyperscan](https://github.com/intel/hyperscan) for [Openr
 
 So we need a [C wrapper](hs_wrapper/) to handle callbacks.
 
-## Table of Contents
-
-<!-- TOC -->
-
-- [lua-resty-hyperscan](#lua-resty-hyperscan)
-- [Table of Contents](#table-of-contents)
-- [Status](#status)
-- [Synopsis](#synopsis)
-- [Methods](#methods)
-  - [block_new](#block_new)
-  - [block_free](#block_free)
-  - [handle:compile](#handlecompile)
-    - [Pattern List](#pattern-list)
-      - [Example](#example)
-      - [Flags](#flags)
-  - [handle:scan](#handlescan)
-- [Copyright and License](#copyright-and-license)
-
-<!-- /TOC -->
-
 ## Status
 
 This library is under development so far.
@@ -33,6 +13,23 @@ This library is under development so far.
 **THIS LIBRARY ONLY SUPPORT [BLOCK SCAN](http://intel.github.io/hyperscan/dev-reference/api_files.html#c.HS_MODE_BLOCK) NOW !**
 
 **THIS LIBRARY IS ONLY TESTED on CentOS 7 !**
+
+------
+
+## Table of Contents
+
+- [Status](#status)
+- [Synopsis](#synopsis)
+- [Methods](#methods)
+  - [block_new](#block_new)
+  - [block_free](#block_free)
+  - [block_get](#block_get)
+  - [handle:compile](#handlecompile)
+    - [Pattern List](#pattern-list)
+      - [Example](#example)
+      - [Flags](#flags)
+  - [handle:scan](#handlescan)
+  - [handle:free](#handlefree)
 
 ----
 
@@ -131,7 +128,7 @@ end
 
 ### block_new
 
-Create a hyperscan instance for block mode
+Create a hyperscan instance for block mode.
 
 ```lua
 local handle, err = whs.block_new(name, debug)
@@ -140,24 +137,37 @@ if not handle then
 end
 ```
 
-| Field        | Name     | Lua Type | Description                   |
-| ------------ | -------- | -------- | ----------------------------- |
-| Parameter    | `name`   | string   | instance name, mainly for log |
-|              | `debug`  | boolean  | enable/disable write debug log to syslog |
-| Return Value | `handle` | cdata    | instance pointer              |
-|              | `err`    | string   | reason of failure             |
-
-[Back to TOC](#table-of-contents)
+| Field        | Name     | Lua Type  | Description                              |
+| ------------ | -------- | --------- | ---------------------------------------- |
+| Parameter    | `name`   | string    | instance name, mainly for log            |
+|              | `debug`  | boolean   | enable/disable write debug log to syslog |
+| Return Value | `handle` | table/nil | instance reference                       |
+|              | `err`    | string    | reason of failure                        |
 
 ### block_free
 
-Destroy a hyperscan instance for block mode
+Destroy a hyperscan instance for block mode.
 
 ```lua
 whs.block_free(name)
 ```
 
+### block_get
+
+Get the instance reference by name.
+
+```lua
+local handle = whs.block_get(name)
+```
+
+| Filed        | Name     | Lua Type  | Description        |
+| ------------ | -------- | --------- | ------------------ |
+| Parameter    | `name`   | string    | instance name      |
+| Return Value | `handle` | table/nil | instance reference |
+
 ### handle:compile
+
+compile regular expression into a Hyperscan database.
 
 ```lua
 --local handle = whs.block_new(name, debug)
@@ -203,8 +213,10 @@ local patterns = {
 
 ### handle:scan
 
+The actual pattern matching takes place for block-mode pattern databases.
+
 ```lua
---local handle = whs.block_new(name, debug)
+--local handle = whs.block_get(name)
 local ok, id, from, to = handle:scan(data)
 if ok then
     ngx.log(ngx.INFO, "match success", id, from, to)
@@ -219,7 +231,16 @@ end
 |              | `from` | number   | match from byte arrary index(include itself) |
 |              | `to`   | number   | match end byte arrary index(exclude itself)  |
 
-[I Back to TOC](#table-of-contents)
+### handle:free
+
+Destroy a hyperscan instance for block mode.
+
+```lua
+--local handle = whs.block_get(name)
+handle:free()
+```
+
+[Back to TOC](#table-of-contents)
 
 ---
 
