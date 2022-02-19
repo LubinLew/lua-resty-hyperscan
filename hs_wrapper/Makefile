@@ -6,7 +6,7 @@ LIBS=`pkg-config --libs   libhs`
 all:libwhs.so
 
 libwhs.so:wrapper.o
-	gcc -shared -Wl,--whole-archive -l:libhs.a -Wl,--no-whole-archive -o $@ $^ -lm -lstdc++
+	gcc -shared -o $@ $^ -lm -lstdc++ -lhs
 
 wrapper.o:wrapper.c wrapper.h
 	gcc -c -g -Wall -Werror -fPIC -O2 ${INCS} $< -o $@
