@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <assert.h>
 #include "wrapper.h"
 
 
-const char * pattern[] = {
+const char* pattern[] = {
     "123456",
     "hello",
     "\\d{5}"
@@ -17,21 +17,20 @@ const unsigned int ids[] = {
     1001, 1002, 1003
 };
 
-const char * inputdata[] = {
+const char* inputdata[] = {
     "01234567",
     "hello world",
     "11111111"
 };
 
 
-int main(void)
+
+int test_block(void)
 {
     int i, ret;
     whs_hdl_t* handle;
 
-    whs_init();
-
-    handle = whs_block_create("test", 1); //enable debug output
+    handle = whs_block_create("test_block", 1); //enable debug output
     if (NULL == handle) {
         exit(EXIT_FAILURE);
     }
@@ -54,6 +53,61 @@ int main(void)
     }
 
     whs_block_free(handle);
+    return 0;
+}
 
+
+int test_vector(void)
+{
+    int ret;
+    whs_hdl_t* handle;
+
+    handle = whs_vector_create("test_vector", 1); //enable debug output
+    if (NULL == handle) {
+        exit(EXIT_FAILURE);
+    }
+
+    ret = whs_vector_compile(handle, pattern, NULL, ids, 3);
+    if (ret != 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    const char* inputdata[]={
+        "dasff",
+        "dacxf",
+        "dhellodd",
+        "dadsf",
+        "dasfa",
+    };
+    unsigned int inputdatalen[]={
+        5,
+        5,
+        8,
+        5,
+        5,
+        5,
+    };
+
+    unsigned int id;
+    unsigned int dataindex;
+    unsigned long long to;
+    ret = whs_vector_scan(handle, inputdata, inputdatalen, sizeof(inputdata) /sizeof(const char*), &id, &dataindex, &to);
+    if (ret == 1) {
+        printf("[ID:%u][dataindex:%u][stop:%llu]\n", id, dataindex, to);
+        assert(dataindex == 2);
+    } else {
+      printf("NOT MATCHED\n");
+    }
+
+    whs_vector_free(handle);
+    return 0;
+}
+
+
+int main()
+{
+    whs_init();
+    test_block();
+    test_vector();
     exit(EXIT_SUCCESS);
 }
