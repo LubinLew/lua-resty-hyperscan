@@ -339,7 +339,7 @@ local function _whs_vector_scan(self, strings)
 
     local ret = whs.whs_vector_scan(self.handle, strings, lens, count, id, dataindex, to)
     if ret == 1 then
-        return true, tonumber(id[0]), tonumber(dataindex[0]), tonumber(to[0])
+        return true, tonumber(id[0]), tonumber(dataindex[0] + 1), tonumber(to[0])
     end
 
     return false
