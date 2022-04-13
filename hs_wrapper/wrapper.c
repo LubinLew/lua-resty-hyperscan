@@ -103,6 +103,49 @@ whs_init(void)
 }
 
 
+int
+whs_compile(whs_hdl_t* handle,
+                        const char *const *expressions,
+                        const unsigned int *flags,
+                        const unsigned int *ids,
+                        unsigned int count,
+                        unsigned int mode)
+{
+    int loop;
+    hs_error_t ret;
+    hs_compile_error_t* compile_err;
+
+    if (!expressions || !ids) {
+        Error("Invalid Paramters");
+        return -1;
+    }
+
+    Debug("expressions count is %u", count);
+    for (loop = 0; loop < count; loop++) {
+        unsigned int flag = flags?flags[loop]:0;
+        Debug("[%u][%u]-[%s]", ids[loop], flag, expressions[loop]);
+    }
+
+    ret = hs_compile_ext_multi(expressions, flags, ids, NULL, count,
+                        mode, NULL, &handle->db, &compile_err);
+    if (ret) {
+        Error("hs_compile_ext_multi() failed: %s", compile_err->message);
+        hs_free_compile_error(compile_err);
+        return -1;
+    }
+
+    ret = hs_alloc_scratch(handle->db, &handle->scratch);
+    if (ret != HS_SUCCESS) {
+        Error("hs_alloc_scratch: %d", ret);
+        hs_free_database(handle->db);
+        handle->db = NULL;
+        return -1;
+    }
+
+    return 0;
+}
+
+
 whs_hdl_t*
 whs_block_create(const char *name, int debug)
 {
@@ -127,38 +170,7 @@ whs_block_compile(whs_hdl_t* handle,
                         const unsigned int *ids,
                         unsigned int count)
 {
-    int loop;
-    hs_error_t ret;
-    hs_compile_error_t* compile_err;
-
-    if (!expressions || !ids) {
-        Error("Invalid Paramters");
-        return -1;
-    }
-
-    Debug("expressions count is %u", count);
-    for (loop = 0; loop < count; loop++) {
-        unsigned int flag = flags?flags[loop]:0;
-        Debug("[%u][%u]-[%s]", ids[loop], flag, expressions[loop]);
-    }
-
-    ret = hs_compile_ext_multi(expressions, flags, ids, NULL, count,
-                        HS_MODE_BLOCK, NULL, &handle->db, &compile_err);
-    if (ret) {
-        Error("hs_compile_ext_multi() failed: %s", compile_err->message);
-        hs_free_compile_error(compile_err);
-        return -1;
-    }
-
-    ret = hs_alloc_scratch(handle->db, &handle->scratch);
-    if (ret != HS_SUCCESS) {
-        Error("hs_alloc_scratch: %d", ret);
-        hs_free_database(handle->db);
-        handle->db = NULL;
-        return -1;
-    }
-
-    return 0;
+    return whs_compile(handle, expressions, flags, ids, count, HS_MODE_BLOCK);
 }
 
 int
@@ -231,3 +243,75 @@ whs_block_free(whs_hdl_t* handle)
     free(handle);
 }
 
+whs_hdl_t*
+whs_vector_create(const char* name,
+                    int debug) {
+  return whs_block_create(name, debug);
+}
+
+int
+whs_vector_compile(whs_hdl_t* handle,
+                    const char* const* expressions,
+                    const unsigned int* flags,
+                    const unsigned int* ids,
+                    unsigned int count) {
+  return whs_compile(handle, expressions, flags, ids, count, HS_MODE_VECTORED);
+}
+
+int
+whs_vector_scan(whs_hdl_t* handle,
+                    const char** datas,
+                    unsigned int* lens,
+                    unsigned int count,
+                    unsigned int* id,
+                    unsigned int* dataIndex,
+                    unsigned long long* to) {
+  hs_error_t ret;
+  whs_match_t match;
+
+  if (!datas) {
+    return -1;
+  }
+
+  if (!lens) {
+    return -1;
+  }
+
+  ret = hs_scan_vector(handle->db, datas, lens, count, 0, handle->scratch,
+                       eventHandler, &match);
+  if (likely(HS_SUCCESS == ret)) {
+    return 0;
+  }
+
+  if (likely(HS_SCAN_TERMINATED == ret)) {
+    if (likely(id)) {
+      *id = match.id;
+    }
+    if (likely(to)) {
+      *to = match.to;
+    }
+    if (likely(dataIndex)) {
+        long long offset = (long long)match.to;
+        for (size_t i = 0; i < count; i++)
+        {
+            offset -= lens[i];
+            if (offset <= 0){
+                *dataIndex = i;
+                break;
+            }
+        }
+    }
+
+    Debug("MATCH id:%u, from:%llu, to:%llu, flags:%u", match.id, match.from,
+          match.to, match.flags);
+    return 1;
+  }
+
+  Error("hs_scan() return %d", ret);
+  return -1;
+}
+
+void
+whs_vector_free(whs_hdl_t* handle) { 
+    return whs_block_free(handle); 
+}

@@ -30,6 +30,9 @@ This library is under development so far.
       - [Flags](#flags)
   - [handle:scan](#handlescan)
   - [handle:free](#handlefree)
+  - [vector_new](#vector_new)
+  - [vector_free](#vector_free)
+  - [vector_get](#vector_get)
 
 ----
 
@@ -165,6 +168,46 @@ local handle = whs.block_get(name)
 | Parameter    | `name`   | string    | instance name      |
 | Return Value | `handle` | table/nil | instance reference |
 
+
+### vector_new
+
+Create a hyperscan instance for vector mode.
+
+```lua
+local handle, err = whs.vector_new(name, debug)
+if not handle then
+    ngx.log(ngx.ERR, "reason: ", err)
+end
+```
+
+| Field        | Name     | Lua Type  | Description                              |
+| ------------ | -------- | --------- | ---------------------------------------- |
+| Parameter    | `name`   | string    | instance name, mainly for log            |
+|              | `debug`  | boolean   | enable/disable write debug log to syslog |
+| Return Value | `handle` | table/nil | instance reference                       |
+|              | `err`    | string    | reason of failure                        |
+
+### vector_free
+
+Destroy a hyperscan instance for vector mode.
+
+```lua
+whs.vector_free(name)
+```
+
+### vector_get
+
+Get the instance reference by name.
+
+```lua
+local handle = whs.vector_get(name)
+```
+
+| Filed        | Name     | Lua Type  | Description        |
+| ------------ | -------- | --------- | ------------------ |
+| Parameter    | `name`   | string    | instance name      |
+| Return Value | `handle` | table/nil | instance reference |
+
 ### handle:compile
 
 compile regular expression into a Hyperscan database.
@@ -222,6 +265,16 @@ if ok then
     ngx.log(ngx.INFO, "match success", id, from, to)
 end
 ```
+The actual pattern matching takes place for vector-mode pattern databases.
+```lua
+--local handle = whs.vector_get(name)
+--local data = {"s","s2"}
+--local data = "s"
+local ok, id, dataindex, to = handle:scan(data)
+if ok then
+    ngx.log(ngx.INFO, "match success", id, from, to)
+end
+```
 
 | Field        | Name   | Lua Type | Description                                  |
 | ------------ | ------ | -------- | -------------------------------------------- |
@@ -230,6 +283,7 @@ end
 |              | `id`   | number   | match id                                     |
 |              | `from` | number   | match from byte arrary index(include itself) |
 |              | `to`   | number   | match end byte arrary index(exclude itself)  |
+|              | `dataindex`   | number   | match data index(only vector mode)  |
 
 ### handle:free
 
