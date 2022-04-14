@@ -278,7 +278,7 @@ end
 
 | Field        | Name   | Lua Type | Description                                  |
 | ------------ | ------ | -------- | -------------------------------------------- |
-| Parameter    | `data` | string   | string to be scanned                         |
+| Parameter    | `data` | string/string[]   | string to be scanned(string[] only vector mode)                         |
 | Return Value | `ok`   | boolean  | `ture` for match, `false` for not match      |
 |              | `id`   | number   | match id                                     |
 |              | `from` | number   | match from byte arrary index(include itself) |

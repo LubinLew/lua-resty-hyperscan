@@ -292,7 +292,8 @@ whs_vector_scan(whs_hdl_t* handle,
     }
     if (likely(dataIndex)) {
         long long offset = (long long)match.to;
-        for (size_t i = 0; i < count; i++)
+        size_t i;
+        for (i = 0; i < count; i++)
         {
             offset -= lens[i];
             if (offset <= 0){
