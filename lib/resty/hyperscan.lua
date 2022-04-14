@@ -11,7 +11,7 @@ local table_new = require ("table.new")
 
 -- module
 local _M = {
-    _VERSION = '0.2.1',
+    _VERSION = '0.3',
 }
 
 -- metatable
