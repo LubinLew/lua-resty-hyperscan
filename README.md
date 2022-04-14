@@ -22,17 +22,12 @@ This library is under development so far.
 - [Synopsis](#synopsis)
 - [Methods](#methods)
   - [block_new](#block_new)
-  - [block_free](#block_free)
-  - [block_get](#block_get)
   - [handle:compile](#handlecompile)
     - [Pattern List](#pattern-list)
       - [Example](#example)
       - [Flags](#flags)
   - [handle:scan](#handlescan)
-  - [handle:free](#handlefree)
   - [vector_new](#vector_new)
-  - [vector_free](#vector_free)
-  - [vector_get](#vector_get)
 
 ----
 
@@ -147,27 +142,6 @@ end
 | Return Value | `handle` | table/nil | instance reference                       |
 |              | `err`    | string    | reason of failure                        |
 
-### block_free
-
-Destroy a hyperscan instance for block mode.
-
-```lua
-whs.block_free(name)
-```
-
-### block_get
-
-Get the instance reference by name.
-
-```lua
-local handle = whs.block_get(name)
-```
-
-| Filed        | Name     | Lua Type  | Description        |
-| ------------ | -------- | --------- | ------------------ |
-| Parameter    | `name`   | string    | instance name      |
-| Return Value | `handle` | table/nil | instance reference |
-
 
 ### vector_new
 
@@ -186,27 +160,6 @@ end
 |              | `debug`  | boolean   | enable/disable write debug log to syslog |
 | Return Value | `handle` | table/nil | instance reference                       |
 |              | `err`    | string    | reason of failure                        |
-
-### vector_free
-
-Destroy a hyperscan instance for vector mode.
-
-```lua
-whs.vector_free(name)
-```
-
-### vector_get
-
-Get the instance reference by name.
-
-```lua
-local handle = whs.vector_get(name)
-```
-
-| Filed        | Name     | Lua Type  | Description        |
-| ------------ | -------- | --------- | ------------------ |
-| Parameter    | `name`   | string    | instance name      |
-| Return Value | `handle` | table/nil | instance reference |
 
 ### handle:compile
 
@@ -285,14 +238,6 @@ end
 |              | `to`   | number   | match end byte arrary index(exclude itself)  |
 |              | `dataindex`   | number   | match data index(only vector mode)  |
 
-### handle:free
-
-Destroy a hyperscan instance for block mode.
-
-```lua
---local handle = whs.block_get(name)
-handle:free()
-```
 
 [Back to TOC](#table-of-contents)
 
