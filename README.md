@@ -2,17 +2,16 @@
 
 lua-resty-hyperscan - [Hyperscan](https://github.com/intel/hyperscan) for [Openresty](https://github.com/openresty/openresty)
 
-!!! [Old Branch](https://github.com/LubinLew/lua-resty-hyperscan/tree/v0.1) got [too many callbacks](https://github.com/LubinLew/lua-resty-hyperscan/issues/1) problem, because luajit is not fully support [CALLBACK](https://luajit.org/ext_ffi_semantics.html#callback).
-
-So we need a [C wrapper](hs_wrapper/) to handle callbacks.
+> !!! [Old Branch](https://github.com/LubinLew/lua-resty-hyperscan/tree/v0.1) got [too many callbacks](https://github.com/LubinLew/lua-resty-hyperscan/issues/1) problem, because luajit is not fully support [CALLBACK](https://luajit.org/ext_ffi_semantics.html#callback).
+> 
+> So we need a [C wrapper](hs_wrapper/) to handle callbacks.
 
 ## Status
 
 This library is under development so far.
 
-**THIS LIBRARY ONLY SUPPORT [BLOCK SCAN](http://intel.github.io/hyperscan/dev-reference/api_files.html#c.HS_MODE_BLOCK) NOW !**
+Support [Block Mode](http://intel.github.io/hyperscan/dev-reference/runtime.html#block-mode) and [Vectored Mode](http://intel.github.io/hyperscan/dev-reference/runtime.html#vectored-mode) now.
 
-**THIS LIBRARY IS ONLY TESTED on CentOS 7 !**
 
 ------
 
