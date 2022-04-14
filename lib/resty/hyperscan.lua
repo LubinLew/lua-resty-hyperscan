@@ -333,6 +333,8 @@ local function _whs_vector_scan(self, strings)
         lens[i] = #v
     end
 
+    strings = ffi_new("const char* [?]", count, strings)
+    lens = ffi_new("unsigned int[?]", count, lens)
     local id    = ffi_new('unsigned int[1]')
     local dataindex  = ffi_new('unsigned int[1]')
     local to    = ffi_new('unsigned long long[1]')
