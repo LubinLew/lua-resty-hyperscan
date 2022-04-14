@@ -2,9 +2,9 @@
 
 lua-resty-hyperscan - [Hyperscan](https://github.com/intel/hyperscan) for [Openresty](https://github.com/openresty/openresty)
 
-> !!! [Old Branch](https://github.com/LubinLew/lua-resty-hyperscan/tree/v0.1) got [too many callbacks](https://github.com/LubinLew/lua-resty-hyperscan/issues/1) problem, because luajit is not fully support [CALLBACK](https://luajit.org/ext_ffi_semantics.html#callback).
-> 
-> So we need a [C wrapper](hs_wrapper/) to handle callbacks.
+> !!! [Old Branch](https://github.com/LubinLew/lua-resty-hyperscan/tree/v0.1) got [too many callbacks](https://github.com/LubinLew/lua-resty-hyperscan/issues/1) problem, because luajit is not fully support [CALLBACK](https://luajit.org/ext_ffi_semantics.html#callback). So we need a [C wrapper](hs_wrapper/) to handle callbacks.
+
+----
 
 ## Status
 
@@ -12,13 +12,25 @@ This library is under development so far.
 
 Support [Block Mode](http://intel.github.io/hyperscan/dev-reference/runtime.html#block-mode) and [Vectored Mode](http://intel.github.io/hyperscan/dev-reference/runtime.html#vectored-mode) now.
 
+---
+
+## Install
+
+```bash
+# first, you should install openresty
+git clone git@github.com:LubinLew/lua-resty-hyperscan.git
+cd lua-resty-hyperscan
+make
+make install
+make test
+```
 
 ------
 
 ## Table of Contents
 
-- [Status](#status)
-- [Synopsis](#synopsis)
+[Synopsis](#synopsis)
+
 - [Methods](#methods)
   - [block_new](#block_new)
   - [block_free](#block_free)
@@ -99,7 +111,7 @@ http {
 }
 ```
 
-test with uri
+test cases:
 
 ```bash
 $ curl http://localhost
@@ -116,6 +128,8 @@ $ curl http://localhost/aaaaaaa
 ```
 
 [Back to TOC](#table-of-contents)
+
+---
 
 ## Methods
 
@@ -166,7 +180,6 @@ local handle = whs.block_get(name)
 | ------------ | -------- | --------- | ------------------ |
 | Parameter    | `name`   | string    | instance name      |
 | Return Value | `handle` | table/nil | instance reference |
-
 
 ### vector_new
 
@@ -221,7 +234,7 @@ end
 
 | Field        | Name       | Lua Type | Description       |
 | ------------ | ---------- | -------- | ----------------- |
-| parameter    | `patterns` | table    | pattern list)     |
+| parameter    | `patterns` | table    | pattern list      |
 | Return Value | `ok`       | boolean  | success/failure   |
 |              | `err`      | string   | reason of failure |
 
@@ -264,7 +277,9 @@ if ok then
     ngx.log(ngx.INFO, "match success", id, from, to)
 end
 ```
+
 The actual pattern matching takes place for vector-mode pattern databases.
+
 ```lua
 --local handle = whs.vector_get(name)
 --local data = {"s","s2"}
@@ -275,18 +290,18 @@ if ok then
 end
 ```
 
-| Field        | Name   | Lua Type | Description                                  |
-| ------------ | ------ | -------- | -------------------------------------------- |
-| Parameter    | `data` | string/string[]   | string to be scanned(string[] only vector mode)                         |
-| Return Value | `ok`   | boolean  | `ture` for match, `false` for not match      |
-|              | `id`   | number   | match id                                     |
-|              | `from` | number   | match from byte arrary index(include itself) |
-|              | `to`   | number   | match end byte arrary index(exclude itself)  |
-|              | `dataindex`   | number   | match data index(only vector mode)  |
+| Field        | Name        | Lua Type        | Description                                     |
+| ------------ | ----------- | --------------- | ----------------------------------------------- |
+| Parameter    | `data`      | string/string[] | string to be scanned(string[] only vector mode) |
+| Return Value | `ok`        | boolean         | `ture` for match, `false` for not match         |
+|              | `id`        | number          | match id                                        |
+|              | `from`      | number          | match from byte arrary index(include itself)    |
+|              | `to`        | number          | match end byte arrary index(exclude itself)     |
+|              | `dataindex` | number          | match data index(only vector mode)              |
 
 ### handle:free
 
-Destroy a hyperscan instance for block mode.
+Destroy a hyperscan instance.
 
 ```lua
 --local handle = whs.block_get(name)
