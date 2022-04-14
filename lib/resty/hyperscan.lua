@@ -126,7 +126,6 @@ whs_block_free(whs_hdl_t* handle);
 -----------------------------------------------------------------------------------------
 local so_name = "libwhs.so"
 local whs
-local store = {} -- handle array
 
 -- load library
 for k,_ in string.gmatch(package.cpath, "[^;]+") do
@@ -230,15 +229,6 @@ local function _whs_block_scan(self, string)
     return false
 end
 
-
-local function _whs_block_free(self)
-    whs.whs_block_free(self.handle)
-    if store[self.name] then
-        store[self.name] = nil
-    end
-end
-
-
 function _M.block_new(name, debug)
     if not whs then
         return nil, "libwhs.so load failed !"
@@ -256,40 +246,20 @@ function _M.block_new(name, debug)
         return nil, "Parameter 'debug' should be a boolean value"
     end
 
-    if store[name] then
-        return nil, name .. " already exist"
-    end
-
     local _whs_handle = whs.whs_block_create(name, debug)
     if not _whs_handle then
         return nil, "out of memeory"
     end
+    ffi.gc(_whs_handle,whs.whs_block_free)
 
     local newtab = setmetatable({
             name         =  name,
             handle       = _whs_handle,
             compile      = _whs_block_compile,
             scan         = _whs_block_scan,
-            free         = _whs_block_free
         }, mt)
 
-    store[name] = newtab
     return newtab
-end
-
-function _M.block_free(name)
-    local handle_table = store[name]
-    if handle_table then
-        _whs_block_free(handle_table.handle)
-        store[name] = nil
-    end
-end
-
-function _M.block_get(name)
-    if store[name] then
-        return store[name]
-    end
-    return nil
 end
 
 local function _whs_vector_compile(self, patterns)
@@ -345,15 +315,6 @@ local function _whs_vector_scan(self, strings)
     return false
 end
 
-
-local function _whs_vector_free(self)
-    whs.whs_vector_free(self.handle)
-    if store[self.name] then
-        store[self.name] = nil
-    end
-end
-
-
 function _M.vector_new(name, debug)
     if not whs then
         return nil, "libwhs.so load failed !"
@@ -371,40 +332,21 @@ function _M.vector_new(name, debug)
         return nil, "Parameter 'debug' should be a boolean value"
     end
 
-    if store[name] then
-        return nil, name .. " already exist"
-    end
-
     local _whs_handle = whs.whs_vector_create(name, debug)
     if not _whs_handle then
         return nil, "out of memeory"
     end
+    ffi.gc(_whs_handle,whs.whs_vector_free)
+
 
     local newtab = setmetatable({
             name         =  name,
             handle       = _whs_handle,
             compile      = _whs_vector_compile,
             scan         = _whs_vector_scan,
-            free         = _whs_vector_free
         }, mt)
 
-    store[name] = newtab
     return newtab
-end
-
-function _M.vector_free(name)
-    local handle_table = store[name]
-    if handle_table then
-        _whs_vector_free(handle_table.handle)
-        store[name] = nil
-    end
-end
-
-function _M.vector_get(name)
-    if store[name] then
-        return store[name]
-    end
-    return nil
 end
 
 -----------------------------------------------------------------------------------------
