@@ -16,13 +16,15 @@ __DATA__
 Normal Mode Test
 
 --- http_config
+   	lua_package_path "./lib/?.lua;;";
+	lua_package_cpath "./hs_wrapper/?.so;;";
 init_by_lua_block {
     local whs, err = require('resty.hyperscan')
     if not whs then
         ngx.log(ngx.ERR, "hyperscan init failed, ", err)
     end
 
-    local handle = whs.vector_new("test", false)
+    handle = whs.vector_new("test", false)
 
     local patterns = {
         {id = 1001, pattern = "\\d3",       flag = "iu"},
@@ -41,8 +43,6 @@ init_by_lua_block {
 --- config
 location = /t {
     content_by_lua_block {
-        local whs = require('resty.hyperscan')
-        local handle = whs.vector_get("test")
         local ret, id, dataindex = handle:scan({"0000xxx","abcdefghisghk"})
         if ret then
             return ngx.print("matchid:", id, " dataindex:", dataindex)

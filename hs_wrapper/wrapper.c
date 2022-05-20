@@ -20,8 +20,10 @@
 
 #ifdef __GNUC__
 #define likely(x)   __builtin_expect(!!(x), 1)
+#define unlikely(x)   __builtin_expect(!!(x), 0)
 #else  /* __GNUC__ */
 #define likely(x)   (x)
+#define unlikely(x)   (x)
 #endif /* __GNUC__ */
 
 #ifndef __NO_SYSLOG
@@ -32,47 +34,59 @@
 #define Debug(fmt, ...) if (handle->debug) printf("[%s][%s:%d]"fmt"\n", handle->name, __FUNCTION__, __LINE__,##__VA_ARGS__)
 #endif /* __NO_SYSLOG */
 
-#define MAX_NAME_LEN (128)
+#define MAX_NAME_LEN 128
 /* ------------------------------------------------------------------------------------------ */
 
 /* handler */
 struct _whs_hdl {
-    hs_database_t *db;
-    hs_scratch_t  *scratch;
+    hs_database_t* db;
+    hs_scratch_t* scratch;
     int            debug;
     char           name[MAX_NAME_LEN + 1];
 };
 
-typedef struct _whs_match {
-    unsigned int id;
-    unsigned long long from;
-    unsigned long long to;
-    unsigned int flags;
-} whs_match_t;
-
 /* ------------------------------------------------------------------------------------------ */
 
-/** the match event callback function 
- * Return: 
+/** the match event callback function
+ * Return:
  *    Non-zero: the matching should cease
       zero   : the matching should go on
 */
 static int
 eventHandler(unsigned int id,
-                 unsigned long long from,
-                 unsigned long long to,
-                 unsigned int flags,
-                 void *ctx) 
+    unsigned long long from,
+    unsigned long long to,
+    unsigned int flags,
+    void* ctx)
 {
-    whs_match_t *match = (whs_match_t *)ctx;
+    whs_match_t* match = (whs_match_t*)ctx;
     if (likely(ctx)) {
-        match->id    = id;
-        match->from  = from;
-        match->to    = to;
+        match->id = id;
+        match->from = from;
+        match->to = to;
         match->flags = flags;
     }
 
     return HS_SCAN_TERMINATED;
+}
+
+static int
+eventHandlerMulti(unsigned int id, unsigned long long from,
+    unsigned long long to,
+    unsigned int flags,
+    void* ctx)
+{
+    whs_multi_match_t* multi_match = (whs_multi_match_t*)ctx;
+    if (likely(ctx)) {
+        whs_match_t* match = &(multi_match->matchs[multi_match->cur]);
+        match->id = id;
+        match->from = from;
+        match->to = to;
+        match->flags = flags;
+        multi_match->cur++;
+        return multi_match->cur >= multi_match->len ? HS_SCAN_TERMINATED : HS_SUCCESS;
+    }
+    return HS_INVALID;
 }
 
 
@@ -82,7 +96,7 @@ whs_init(void)
     hs_error_t ret;
 
 #ifndef __NO_SYSLOG
-        openlog("[libwhs]", LOG_CONS|LOG_PID, LOG_USER);
+    openlog("[libwhs]", LOG_CONS | LOG_PID, LOG_USER);
 #endif /* __NO_SYSLOG */
 
     /* veritfy arch */
@@ -94,9 +108,9 @@ whs_init(void)
 #endif /* __NO_SYSLOG */
         return -1;
     }
-    
+
 #ifndef __NO_SYSLOG
-     syslog(LOG_INFO, "whs_init() success");
+    syslog(LOG_INFO, "whs_init() success");
 #endif /* __NO_SYSLOG */
 
     return 0;
@@ -105,11 +119,11 @@ whs_init(void)
 
 int
 whs_compile(whs_hdl_t* handle,
-                        const char *const *expressions,
-                        const unsigned int *flags,
-                        const unsigned int *ids,
-                        unsigned int count,
-                        unsigned int mode)
+    const char* const* expressions,
+    const unsigned int* flags,
+    const unsigned int* ids,
+    unsigned int count,
+    unsigned int mode)
 {
     int loop;
     hs_error_t ret;
@@ -122,12 +136,12 @@ whs_compile(whs_hdl_t* handle,
 
     Debug("expressions count is %u", count);
     for (loop = 0; loop < count; loop++) {
-        unsigned int flag = flags?flags[loop]:0;
+        unsigned int flag = flags ? flags[loop] : 0;
         Debug("[%u][%u]-[%s]", ids[loop], flag, expressions[loop]);
     }
 
     ret = hs_compile_ext_multi(expressions, flags, ids, NULL, count,
-                        mode, NULL, &handle->db, &compile_err);
+        mode, NULL, &handle->db, &compile_err);
     if (ret) {
         Error("hs_compile_ext_multi() failed: %s", compile_err->message);
         hs_free_compile_error(compile_err);
@@ -147,9 +161,9 @@ whs_compile(whs_hdl_t* handle,
 
 
 whs_hdl_t*
-whs_block_create(const char *name, int debug)
+whs_block_create(const char* name, int debug)
 {
-    whs_hdl_t *handle = NULL;
+    whs_hdl_t* handle = NULL;
 
     handle = (whs_hdl_t*)calloc(sizeof(whs_hdl_t), 1);
     if (NULL == handle) {
@@ -165,24 +179,27 @@ whs_block_create(const char *name, int debug)
 
 int
 whs_block_compile(whs_hdl_t* handle,
-                        const char *const *expressions,
-                        const unsigned int *flags,
-                        const unsigned int *ids,
-                        unsigned int count)
+    const char* const* expressions,
+    const unsigned int* flags,
+    const unsigned int* ids,
+    unsigned int count)
 {
     return whs_compile(handle, expressions, flags, ids, count, HS_MODE_BLOCK);
 }
 
 int
 whs_block_scan(whs_hdl_t* handle,
-                       const char *data, 
-                       unsigned int len,
-                       unsigned int *id,
-                       unsigned long long *from,
-                       unsigned long long *to)
+    const char* data,
+    unsigned int len,
+    unsigned int* id,
+    unsigned long long* from,
+    unsigned long long* to)
 {
     hs_error_t  ret;
     whs_match_t match;
+    if (!data){
+        return -1;
+    }
 
     if (!len) {
         len = strlen(data);
@@ -192,7 +209,7 @@ whs_block_scan(whs_hdl_t* handle,
     if (likely(HS_SUCCESS == ret)) {
         return 0;
     }
- 
+
     if (likely(HS_SCAN_TERMINATED == ret)) {
         if (likely(id)) {
             *id = match.id;
@@ -208,11 +225,41 @@ whs_block_scan(whs_hdl_t* handle,
         return 1;
     }
 
-    
+
     Error("hs_scan() return %d", ret);
     return -1;
 }
 
+int
+whs_block_scan_multi_match(whs_hdl_t* handle,
+    const char* data,
+    unsigned int len,
+    whs_multi_match_t* ctx)
+{
+    hs_error_t  ret;
+
+    if (unlikely(!data)) {
+        return -1;
+    }
+
+    if (unlikely(len <= 0)) {
+        len = strlen(data);
+    }
+
+    ret = hs_scan(handle->db, data, len, 0, handle->scratch, eventHandlerMulti, ctx);
+
+    if (likely(HS_SUCCESS == ret)) {
+        return 0;
+    }
+
+    if (likely(HS_SCAN_TERMINATED == ret)) {
+        return 1;
+    }
+
+
+    Error("hs_scan() return %d", ret);
+    return -1;
+}
 
 void
 whs_block_free(whs_hdl_t* handle)
@@ -245,74 +292,136 @@ whs_block_free(whs_hdl_t* handle)
 
 whs_hdl_t*
 whs_vector_create(const char* name,
-                    int debug) {
-  return whs_block_create(name, debug);
+    int debug) {
+    return whs_block_create(name, debug);
 }
 
 int
 whs_vector_compile(whs_hdl_t* handle,
-                    const char* const* expressions,
-                    const unsigned int* flags,
-                    const unsigned int* ids,
-                    unsigned int count) {
-  return whs_compile(handle, expressions, flags, ids, count, HS_MODE_VECTORED);
+    const char* const* expressions,
+    const unsigned int* flags,
+    const unsigned int* ids,
+    unsigned int count) {
+    return whs_compile(handle, expressions, flags, ids, count, HS_MODE_VECTORED);
 }
 
 int
 whs_vector_scan(whs_hdl_t* handle,
-                    const char** datas,
-                    unsigned int* lens,
-                    unsigned int count,
-                    unsigned int* id,
-                    unsigned int* dataIndex,
-                    unsigned long long* to) {
-  hs_error_t ret;
-  whs_match_t match;
+    const char** datas,
+    unsigned int* lens,
+    unsigned int count,
+    unsigned int* id,
+    unsigned int* dataIndex,
+    unsigned long long* to) {
+    hs_error_t ret;
+    whs_match_t match;
 
-  if (!datas) {
-    return -1;
-  }
-
-  if (!lens) {
-    return -1;
-  }
-
-  ret = hs_scan_vector(handle->db, datas, lens, count, 0, handle->scratch,
-                       eventHandler, &match);
-  if (likely(HS_SUCCESS == ret)) {
-    return 0;
-  }
-
-  if (likely(HS_SCAN_TERMINATED == ret)) {
-    if (likely(id)) {
-      *id = match.id;
+    if (unlikely(!datas)) {
+        return -1;
     }
-    if (likely(to)) {
-      *to = match.to;
+
+    if (unlikely(!lens)) {
+        return -1;
     }
-    if (likely(dataIndex)) {
-        long long offset = (long long)match.to;
-        size_t i;
-        for (i = 0; i < count; i++)
-        {
-            offset -= lens[i];
-            if (offset <= 0){
-                *dataIndex = i;
-                break;
+
+    ret = hs_scan_vector(handle->db, datas, lens, count, 0, handle->scratch,
+        eventHandler, &match);
+    if (likely(HS_SUCCESS == ret)) {
+        return 0;
+    }
+
+    if (likely(HS_SCAN_TERMINATED == ret)) {
+        if (likely(id)) {
+            *id = match.id;
+        }
+        if (likely(to)) {
+            *to = match.to;
+        }
+        if (likely(dataIndex)) {
+            long long offset = (long long)match.to;
+            size_t i;
+            for (i = 0; i < count; i++)
+            {
+                offset -= lens[i];
+                if (offset <= 0) {
+                    *dataIndex = i;
+                    break;
+                }
             }
         }
+
+        Debug("MATCH id:%u, from:%llu, to:%llu, flags:%u", match.id, match.from,
+            match.to, match.flags);
+        return 1;
     }
 
-    Debug("MATCH id:%u, from:%llu, to:%llu, flags:%u", match.id, match.from,
-          match.to, match.flags);
-    return 1;
-  }
+    Error("hs_scan() return %d", ret);
+    return -1;
+}
 
-  Error("hs_scan() return %d", ret);
-  return -1;
+int
+whs_vector_scan_multi_match(whs_hdl_t* handle,
+    const char** datas,
+    unsigned int* lens,
+    unsigned int count,
+    whs_multi_match_t* ctx) {
+    hs_error_t ret;
+
+    if (unlikely(!datas)) {
+        return -1;
+    }
+
+    if (unlikely(!lens)) {
+        return -1;
+    }
+
+    ret = hs_scan_vector(handle->db, datas, lens, count, 0, handle->scratch,
+        eventHandlerMulti, ctx);
+
+    if (unlikely(ret == HS_INVALID)) {
+        return -1;
+    }
+
+    if (likely(HS_SUCCESS == ret)) {
+        return 1;
+    }
+
+    if (likely(HS_SCAN_TERMINATED == ret)) {
+        return 1;
+    }
+
+    Error("hs_scan() return %d", ret);
+    return -1;
 }
 
 void
-whs_vector_free(whs_hdl_t* handle) { 
-    return whs_block_free(handle); 
+whs_vector_free(whs_hdl_t* handle) {
+    return whs_block_free(handle);
+}
+
+int whs_serialize_database(whs_hdl_t* handle, char** bytes, size_t* length) {
+    hs_error_t err = hs_serialize_database(handle->db, bytes, length);
+    if (unlikely(err != HS_SUCCESS)) {
+        Error("hs_serialize_database() return %d", err);
+        return -1;
+    }
+    return 0;
+}
+
+whs_hdl_t* whs_deserialize_database(const char* name, const char* bytes, size_t len) {
+    whs_hdl_t* handle = NULL;
+    hs_error_t ret;
+
+    handle = (whs_hdl_t*)calloc(sizeof(whs_hdl_t), 1);
+    if (NULL == handle) {
+        Error("Insufficient Memory");
+        return NULL;
+    }
+    strncpy(handle->name, name, MAX_NAME_LEN);
+    ret = hs_deserialize_database(bytes, len, &handle->db);
+    if (unlikely(ret != HS_SUCCESS)) {
+        free(handle);
+        return NULL;
+    }
+    return handle;
 }

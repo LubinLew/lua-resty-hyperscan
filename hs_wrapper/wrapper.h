@@ -3,6 +3,18 @@
 #ifndef __HS_WRAPPER_H__
 #define __HS_WRAPPER_H__
 
+typedef struct _whs_match {
+    unsigned int id;
+    unsigned long long from;
+    unsigned long long to;
+    unsigned int flags;
+} whs_match_t;
+
+typedef struct _whs_multi_match {
+    whs_match_t* matchs;
+    uint16_t len;
+    uint16_t cur;
+} whs_multi_match_t;
 
 typedef struct _whs_hdl whs_hdl_t;
 
@@ -22,7 +34,7 @@ whs_init(void);
  *   NULL  : Fail(Out of memory)
  *  Non-null : Success(return a handle)
  */
-whs_hdl_t*
+whs_hdl_t *
 whs_block_create(const char *name, int debug);
 
 
@@ -32,7 +44,7 @@ whs_block_create(const char *name, int debug);
  *   -1 : Error occurred
  */
 int
-whs_block_compile(whs_hdl_t* handle,
+whs_block_compile(whs_hdl_t *handle,
                   const char *const *expressions,
                   const unsigned int *flags,
                   const unsigned int *ids,
@@ -46,17 +58,23 @@ whs_block_compile(whs_hdl_t* handle,
  *   -1 : Error occurred
  */
 int
-whs_block_scan(whs_hdl_t* handle,
-                  const char *data, 
-                  unsigned int len,
-                  unsigned int *id,
-                  unsigned long long *from,
-                  unsigned long long *to);
+whs_block_scan(whs_hdl_t *handle,
+               const char *data,
+               unsigned int len,
+               unsigned int *id,
+               unsigned long long *from,
+               unsigned long long *to);
+
+int
+whs_block_scan_multi_match(whs_hdl_t* handle,
+    const char* data,
+    unsigned int len,
+    whs_multi_match_t* ctx);
 
 
 /* destroy the hyperscan block scan mode instance */
 void
-whs_block_free(whs_hdl_t* handle);
+whs_block_free(whs_hdl_t *handle);
 
 
 /** create a new hyperscan vector scan mode instance
@@ -66,8 +84,8 @@ whs_block_free(whs_hdl_t* handle);
  *   NULL  : Fail(Out of memory)
  *  Non-null : Success(return a handle)
  */
-whs_hdl_t*
-whs_vector_create(const char* name, int debug);
+whs_hdl_t *
+whs_vector_create(const char *name, int debug);
 
 
 /** Compiling Patterns for vector mode
@@ -76,10 +94,10 @@ whs_vector_create(const char* name, int debug);
  *   -1 : Error occurred
  */
 int
-whs_vector_compile(whs_hdl_t* handle,
-                   const char* const* expressions,
-                   const unsigned int* flags,
-                   const unsigned int* ids,
+whs_vector_compile(whs_hdl_t *handle,
+                   const char *const *expressions,
+                   const unsigned int *flags,
+                   const unsigned int *ids,
                    unsigned int count);
 
 
@@ -90,18 +108,28 @@ whs_vector_compile(whs_hdl_t* handle,
  *   -1 : Error occurred
  */
 int
-whs_vector_scan(whs_hdl_t* handle,
-                const char** datas,
-                unsigned int* lens,
+whs_vector_scan(whs_hdl_t *handle,
+                const char **datas,
+                unsigned int *lens,
                 unsigned int count,
-                unsigned int* id,
-                unsigned int* dataIndex,
-                unsigned long long* to);
+                unsigned int *id,
+                unsigned int *dataIndex,
+                unsigned long long *to);
 
+int
+whs_vector_scan_multi_match(whs_hdl_t* handle,
+    const char** datas,
+    unsigned int* lens,
+    unsigned int count,
+    whs_multi_match_t* ctx);
 
 /* destroy the hyperscan vector scan mode instance */
 void
-whs_vector_free(whs_hdl_t* handle);
+whs_vector_free(whs_hdl_t *handle);
+
+int whs_serialize_database(whs_hdl_t *handle, char** bytes, size_t* len);
+
+whs_hdl_t* whs_deserialize_database(const char* name, const char *bytes, size_t len);
 
 
 #endif  /* __HS_WRAPPER_H__ */
